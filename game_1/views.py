@@ -13,6 +13,12 @@ def index(request):
     return HttpResponse(line1 + line4 + line2)
 
 def menu(request):
+    line1 = """
+    <div style = "text-align:center;">
+        <h1><strong> MENU </strong></h1>
+        <a href="/"> 主页面</a>
+    </div>
 
-    return HttpResponse('MENU')
+    """
+    return HttpResponse(line1)
 
