@@ -2,15 +2,16 @@ from django.http import HttpResponse
 
 
 def index(request):
-    line1 = '<h1 style="text-align:center;">Welcome to here!</h1>'
-    line2 = '<img src="https://img1.baidu.com/it/u=3424582540,3550213785&fm=253&fmt=auto&app=138&f=JPEG?w=640&h=360"/>'
-    line4 = """
+    line1 =  """
     <div style="text-align:center; color:red;">
-    <a href="/menu/"> 菜单 </a>
+    <h1 style="text-align:center;">Welcome to here!</h1>
+    <a href="/menu/" style="display:block;"> 菜单 </a>
+    <img src="https://img1.baidu.com/it/u=3424582540,3550213785&fm=253&fmt=auto&app=138&f=JPEG?w=640&h=360"/>
+
     </div>
     """
     
-    return HttpResponse(line1 + line4 + line2)
+    return HttpResponse(line1)
 
 def menu(request):
     line1 = """
