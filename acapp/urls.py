@@ -17,9 +17,7 @@ from django.contrib import admin
 from django.urls import path, include
 
 urlpatterns = [
-    #path('', include('game_1.urls')), # when just have only one project
-        
-
+    path('', include("game_1.urls.index")),
     path('admin/', admin.site.urls),
 
 ]
