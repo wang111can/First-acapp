@@ -3,8 +3,40 @@
 .game_menu{
     width:100%;
     height:100%;
-    background-image:url("/static/image/background/icr_sea_img1.jpg");
-    
-    
+    background-image:url("/static/image/background/ice_sea_img1.jpg");
+    background-size:100% 100%;
+}
+
+.game_menu_select{
+    width:20vw;
+    position:relative;
+    top: 40vh;
+    left:2vw;
+    user-select:none;
 
 }
+.game_menu_select_button{
+
+    color:white;
+    height:5vh;
+    width:23vw;
+    font-size:3vh;
+    padding: 5px 5px;
+    font-style:italic;
+    text-align:center;
+    background-color:rgba(39, 21, 28, 0.6);
+    border-radius:10px;
+    cursor:pointer;
+}
+.game_menu_select_button:hover{
+    transform:scale(1.2);
+    transition:100ms;
+
+}
+
+.game_menu_button_select_one{
+    
+    
+}
+
+
