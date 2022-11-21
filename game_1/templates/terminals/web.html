@@ -16,8 +16,9 @@
 <body  style="margin:0;">
     <div id="acgame_1">
     </div> 
-    <script>
-        $(document).ready(function(){
+    <script type = "module">
+    import {Game} from '/static/js/dist/game.js'
+    $(document).ready(function(){
             let ac_game = new Game("acgame_1");
         });
 
