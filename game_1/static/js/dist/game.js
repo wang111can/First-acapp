@@ -80,6 +80,47 @@ class Game_map extends AcGameObject{
         this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
     }
 }
+class small_ball extends AcGameObject{
+
+    constructor(play_ground, x, y, radius, color, vx, vy, speed){
+        super();
+        this.x = x;
+        this.y = y;
+        this.play_ground = play_ground;
+        this.ctx = this.play_ground.map.ctx;
+        this.radius = radius;
+        this.color = color;
+        this.vx = vx;
+        this.vy = vy;
+        this.speed = speed;
+        this.decelerate = 0.9;
+        this.eps = 0.1;
+    }
+
+    start(){
+    
+
+    }
+    update(){
+        if (this.speed < this.eps){
+            this.destroy();
+            return false;
+        }
+        this.x += this.vx * this.speed * this.timedelta / 1000;
+        this.y += this.vy * this.speed * this.timedelta / 1000;
+        this.speed *= this.decelerate;
+        this.render();
+    }
+    render(){
+        this.ctx.beginPath();
+        this.ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+        this.ctx.fillStyle = this.color;
+        this.ctx.fill();
+    }
+
+
+
+}
 class Player extends AcGameObject{
 
     constructor(play_ground, X, Y, radius, color, speed, is_me){
@@ -89,6 +130,10 @@ class Player extends AcGameObject{
         this.y = Y;
         this.vx = 0;
         this.vy = 0;
+        this.damagex = 0;
+        this.damagey = 0;
+        this.damage_speed = 0;
+        this.decelerate = 0.9;
         this.move_length = 0;
         this.radius = radius;
         this.color = color;
@@ -96,17 +141,17 @@ class Player extends AcGameObject{
         this.is_me = is_me;
         this.eps = 0.01;
         this.ctx = this.play_ground.map.ctx;
-
+        this.debuff_decelerate_time = 0;
         this.cur_skill = null;
-
+        this.speed_up = speed;
     }
-    
+
     start(){
         if (this.is_me){
             this.add_listening_events();
         }
         else { // AI
-            
+
             let tx = Math.random() * this.play_ground.width;
             let ty = Math.random() * this.play_ground.height;
             this.move_to(tx, ty);
@@ -118,9 +163,9 @@ class Player extends AcGameObject{
         let dy = y1 - y2;
         return Math.sqrt(dx * dx + dy * dy);
     }
-    
+
     move_to(tx, ty){
-      //  console.log(tx, ty);
+        //  console.log(tx, ty);
         this.move_length = this.get_dist(this.x, this.y, tx, ty);
         let angle = Math.atan2(ty - this.y, tx - this.x);
         this.vx = Math.cos(angle);
@@ -138,10 +183,10 @@ class Player extends AcGameObject{
         let color = "white";
         let speed = this.play_ground.height * 0.5;
         let move_length = this.play_ground.height * 1;
-        let ball =  new fire_ball(this.play_ground, this, x, y, radius, vx, vy, color, speed, move_length);
-        
+        let ball =  new fire_ball(this.play_ground, this, x, y, radius, vx, vy, color, speed, move_length, this.play_ground.height * 0.01);
+
     }
-    
+
     add_listening_events(){
         let op = this;
         this.play_ground.map.$canvas.on("contextmenu", function(){
@@ -164,30 +209,71 @@ class Player extends AcGameObject{
                 op.cur_skill = "fire_ball";
                 return false;
             }
-           
+
 
         });
     }
 
-    update(){
-        if (this.move_length < this.eps){
-            this.move_length = 0;
-            this.vx = this.vy = 0;
-            if (this.is_me === false){
-                let tx = Math.random() * this.play_ground.width;
-                let ty = Math.random() * this.play_ground.height;
-                this.move_to(tx, ty);
+    be_attacked(angle ,damage){
 
+        for (let i = 0;i < 100 + Math.random() * 100;i ++ ){
+            let x = this.x;
+            let y = this.y;
+            let play_ground = this.play_ground;
+            let radius = this.radius * Math.random() * 0.1;
+            let color = "red";
+            let angle = Math.PI * 2 * Math.random();
+            let vx = Math.cos(angle);
+            let vy = Math.sin(angle);
+            let speed = this.speed * 10;
+            new small_ball(play_ground, x, y, radius, color, vx, vy, speed);     
+        }
+        this.radius -= damage;
+        if (this.radius < 10) {
+            this.destroy();
+            return false;
+        }
+        // this.debuff_decelerate_time = 300;
+        this.damagex = Math.cos(angle);
+        this.damagey = Math.sin(angle);
+        this.damage_speed = damage * 100; // 击退效果
+    }
+
+    update(){
+        if (this.debuff_decelerate_time){
+            this.speed = this.speed_up * 0.5;
+            this.debuff_decelerate_time -= 1;
+        }
+        else this.speed = this.speed_up;
+
+        if (this.damage_speed > 50){
+            this.vx = this.vy = 0;
+            this.move_length = 0;
+            this.x += this.damagex * this.damage_speed * this.timedelta / 1000;
+            this.y += this.damagey * this.damage_speed * this.timedelta / 1000;
+            this.damage_speed *= this.decelerate;
+            //  console.log(this.damage_speed);
+
+        }else{
+            if (this.move_length < this.eps){
+                this.move_length = 0;
+                this.vx = this.vy = 0;
+                if (this.is_me === false){
+                    let tx = Math.random() * this.play_ground.width;
+                    let ty = Math.random() * this.play_ground.height;
+                    this.move_to(tx, ty);
+
+                }
             }
-        }
-        else {
-            let move_d = Math.min(this.move_length, this.speed * this.timedelta / 1000);
-            this.x += this.vx * move_d;
-            this.y += this.vy * move_d;
-            this.move_length -= move_d;
-        }
+            else {
+                let move_d = Math.min(this.move_length, this.speed * this.timedelta / 1000);
+                this.x += this.vx * move_d;
+                this.y += this.vy * move_d;
+                this.move_length -= move_d;
+            }}
         this.render();
     }
+
     render(){
         this.ctx.beginPath();
         this.ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
@@ -199,7 +285,7 @@ class Player extends AcGameObject{
 
 class fire_ball extends AcGameObject{
     
-    constructor(play_ground, player, x, y, radius, vx, vy, color, speed, move_length){
+    constructor(play_ground, player, x, y, radius, vx, vy, color, speed, move_length, damage){
         super();
        // console.log("fire_ball");
         this.move_length = move_length;
@@ -214,6 +300,7 @@ class fire_ball extends AcGameObject{
         this.speed = speed;
         this.ctx = this.play_ground.map.ctx;
         this.eps = 0.1;
+        this.damage = damage;
 
 
     }
@@ -221,18 +308,44 @@ class fire_ball extends AcGameObject{
     start(){
     }
 
+            
+    get_dist(x1, y1, x2, y2){
+        let dx = x1 - x2;
+        let dy = y1 - y2;
+        return Math.sqrt(dx * dx + dy * dy);
+    }
+    attack(player){
+       
+        let angle = Math.atan2(player.y - this.y, player.x - this.x);
+        player.be_attacked(angle, this.damage);
+    }
     update(){
         if (this.move_length < this.eps){
             this.destroy();
             return false;
         }
         
-            let move_d = Math.min(this.move_length, this.speed * this.timedelta / 1000);
-            this.x += this.vx * move_d;
-            this.y += this.vy * move_d;
-            this.move_length -= move_d;
+        let move_d = Math.min(this.move_length, this.speed * this.timedelta / 1000);
+        this.x += this.vx * move_d;
+        this.y += this.vy * move_d;
+        this.move_length -= move_d;
+
+        for (let i = 0;i < this.play_ground.players.length;i ++ ){
+            let player = this.play_ground.players[i];
+            let dist = this.get_dist(this.x, this.y, player.x, player.y);
+            if (this.player !== player){
+                if (dist <= this.radius + player.radius){
+                    this.attack(player);
+                    console.log("bump!!!!");
+                    this.destroy();
+                }
+
+            }
+        }
+
         this.render();
     }
+   
     render(){
         this.ctx.beginPath();
         this.ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
@@ -259,7 +372,7 @@ class Game_ground{
         this.map = new Game_map(this);                      
         this.players = [];
         this.players.push(new Player(this, this.width / 2, this.height / 2, this.height * 0.05, "white", this.height * 0.15, true));
-        for (let i = 0;i < 50;i ++ ){
+        for (let i = 0;i < 10;i ++ ){
             let x = Math.random() * this.width;
             let y = Math.random() * this.height;
             this.players.push(new Player(this, x, y, this.height * 0.05, "green", this.height * 0.15, false));

@@ -15,7 +15,7 @@ class Game_ground{
         this.map = new Game_map(this);                      
         this.players = [];
         this.players.push(new Player(this, this.width / 2, this.height / 2, this.height * 0.05, "white", this.height * 0.15, true));
-        for (let i = 0;i < 50;i ++ ){
+        for (let i = 0;i < 10;i ++ ){
             let x = Math.random() * this.width;
             let y = Math.random() * this.height;
             this.players.push(new Player(this, x, y, this.height * 0.05, "green", this.height * 0.15, false));
