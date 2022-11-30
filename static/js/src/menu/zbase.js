@@ -7,7 +7,7 @@ class Game_menu{
     
     <div class="game_menu_select">
         <div class="game_menu_select_button game_menu_button_select_one_mode">
-            Select_1
+            SINGLE PLAYER
             </div>
             <br>
         <div class="game_menu_select_button game_menu_button_select_two_mode">
@@ -26,7 +26,8 @@ class Game_menu{
 
 </div>
         `);
-        
+        this.$menu.hide(); 
+        console.log("hide memu");
         this.root.$ac_game.append(this.$menu);
         this.$one_mode = this.$menu.find('.game_menu_button_select_one_mode');
         this.$two_mode = this.$menu.find('.game_menu_button_select_two_mode');
@@ -55,17 +56,20 @@ class Game_menu{
         });
 
         this.$settings_mode.click(function(){
-            console.log("settings.click");
+            op.root.Setting.logout_on_remote();
         });
 
     }
     
     show(){
+        console.log("show menu");
         this.$menu.show();
         
     }
+ 
     
     hide(){
+        
         this.$menu.hide();
     }
 

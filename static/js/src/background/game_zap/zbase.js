@@ -2,6 +2,7 @@ class Game_map extends AcGameObject{
 
     constructor(play_ground){
         super();
+        console.log("map");   
         this.play_ground = play_ground;
         this.$canvas = $('<canvas></canvas>');
         this.ctx = this.$canvas[0].getContext('2d');
@@ -14,6 +15,10 @@ class Game_map extends AcGameObject{
     update(){
         this.render();
         
+    }
+    hide(){
+    }
+    show(){
     }
     render(){
         this.ctx.fillStyle = "rgba(0, 0, 0, 0.2)";
